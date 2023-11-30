@@ -1,0 +1,25 @@
+package hu.ait.traveldiary.utils
+
+import android.content.Context
+import android.graphics.Bitmap
+import androidx.core.content.ContextCompat
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+
+fun bitmapDescriptor(
+    context: Context,
+    resId: Int
+): BitmapDescriptor? {
+
+    val drawable = ContextCompat.getDrawable(context, resId) ?: return null
+    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+    val bm = Bitmap.createBitmap(
+        drawable.intrinsicWidth,
+        drawable.intrinsicHeight,
+        Bitmap.Config.ARGB_8888
+    )
+
+    val canvas = android.graphics.Canvas(bm)
+    drawable.draw(canvas)
+    return BitmapDescriptorFactory.fromBitmap(bm)
+}
