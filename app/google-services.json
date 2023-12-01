@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "661561684494",
+    "project_id": "wandersnap-5d83f",
+    "storage_bucket": "wandersnap-5d83f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661561684494:android:feb4aac998f948af59c25f",
+        "android_client_info": {
+          "package_name": "hu.ait.traveldiary"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAt-2fHIsYykQDr1N8y-W3FP9w7sGQJ7mU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

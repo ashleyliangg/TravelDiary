@@ -1,4 +1,4 @@
-package hu.ait.traveldiary.ui.screen
+package hu.ait.traveldiary.ui.screen.map
 
 import android.Manifest
 import android.location.Location
