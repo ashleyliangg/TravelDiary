@@ -43,7 +43,7 @@ fun MapScreen(
             LatLng(47.0, 19.0), 10f
         )
     }
-
+//Added comment
     var uiSettings by remember {
         mutableStateOf(
             MapUiSettings(
