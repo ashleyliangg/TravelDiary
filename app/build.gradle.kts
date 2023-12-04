@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "hu.ait.traveldiary"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -76,10 +76,11 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    // maps
+    // Maps
     implementation("com.google.maps.android:maps-compose:2.11.4")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 
+    // Navigation
     val nav_version = "2.5.3"
     implementation("androidx.navigation:navigation-runtime-ktx:$nav_version")
     implementation("androidx.navigation:navigation-compose:$nav_version")
@@ -94,6 +95,9 @@ dependencies {
     // AsyncImage
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
     implementation("io.coil-kt:coil-compose:2.1.0")
+
+    // Extended icons
+    //implementation ("androidx.compose.material:material-icons-extended:$compose_version")
 }
 
 // Allow references to generated code

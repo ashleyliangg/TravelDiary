@@ -28,7 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun FeedScreen(
     feedViewModel: FeedViewModel = viewModel(),
-    onNavigateToWritePost: () -> Unit
+    onNavigateToAddPost: () -> Unit
 ) {
     val postListState = feedViewModel.postsList().collectAsState(
         initial = FeedScreenUIState.Init)
@@ -36,7 +36,7 @@ fun FeedScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("AIT Forum") },
+                title = { Text("Wander Snap") },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor =
                     MaterialTheme.colorScheme.secondaryContainer
@@ -53,7 +53,7 @@ fun FeedScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    onNavigateToWritePost()
+                    onNavigateToAddPost()
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
                 shape = RoundedCornerShape(16.dp),
@@ -65,13 +65,13 @@ fun FeedScreen(
                 )
             }
         }
-    ) {
+    ) { it ->
         Column(modifier = Modifier.padding(it)) {
 
             if (postListState.value == FeedScreenUIState.Init) {
                 Text(text = "Init...")
             } else if (postListState.value is FeedScreenUIState.Success) {
-                LazyColumn() {
+                LazyColumn {
                     items((postListState.value as FeedScreenUIState.Success).postList){
                         PostCard(post = it.post,
                             onRemoveItem = {
