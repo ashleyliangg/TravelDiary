@@ -3,6 +3,7 @@ package hu.ait.traveldiary.ui.screen.feed
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,12 +37,21 @@ fun PostCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp
         ),
-        modifier = Modifier.padding(5.dp)
+        modifier = Modifier.padding(5.dp).fillMaxSize()
     ) {
         Column(
             modifier = Modifier
                 .padding(10.dp)
+                .fillMaxSize()
         ) {
+            if (post.imgUrl != "") {
+                AsyncImage(
+                    model = post.imgUrl,
+                    modifier = Modifier//.size(100.dp, 100.dp)
+                        .fillMaxSize(),
+                    contentDescription = "selected image"
+                )
+            }
             Row(
                 modifier = Modifier.padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -71,14 +81,6 @@ fun PostCard(
                         )
                     }
                 }
-            }
-
-            if (post.imgUrl != "") {
-                AsyncImage(
-                    model = post.imgUrl,
-                    modifier = Modifier.size(100.dp, 100.dp),
-                    contentDescription = "selected image"
-                )
             }
 
         }

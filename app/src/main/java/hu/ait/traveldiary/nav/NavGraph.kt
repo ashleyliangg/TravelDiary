@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import hu.ait.traveldiary.ui.screen.add.AddEntryScreen
 import hu.ait.traveldiary.ui.screen.feed.FeedScreen
 import hu.ait.traveldiary.ui.screen.login.LoginScreen
 
@@ -31,7 +32,7 @@ fun NavGraph(
             )
         }
         composable(Screen.WritePost.route) {
-            //WritePostScreen()
+            AddEntryScreen()
         }
     }
 }
