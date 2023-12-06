@@ -18,14 +18,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -40,6 +45,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
@@ -63,13 +69,13 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import hu.ait.traveldiary.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
-    mapViewModel: MyMapViewModel = hiltViewModel()
+    mapViewModel: MyMapViewModel = hiltViewModel(),
+    cityName: String
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -104,8 +110,7 @@ fun MapScreen(
             TopAppBar(
                 title = {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Switch(
@@ -115,8 +120,7 @@ fun MapScreen(
                                 mapProperties = mapProperties.copy(
                                     mapType = if (isSatellite) MapType.SATELLITE else MapType.NORMAL
                                 )
-                            },
-                            modifier = Modifier.align(Alignment.CenterVertically)
+                            }
                         )
 
                         Spacer(modifier = Modifier.weight(1f))
@@ -134,12 +138,12 @@ fun MapScreen(
                         IconButton(
                             onClick = {
                                 // Handle menu icon click
-                            },
-                            modifier = Modifier.align(Alignment.CenterVertically)
+                            }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = "Toggle drawer"
+                                contentDescription = "Toggle drawer",
+                                modifier = Modifier.size(35.dp)
                             )
                         }
                     }
@@ -148,7 +152,61 @@ fun MapScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             )
+        },
+        bottomBar = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ){
+                Row (
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically),
+                    ){
+                    IconButton(
+                        onClick = {
+                            // Handle menu icon click
+                        },
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Toggle drawer",
+                            modifier = Modifier.size(80.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(10f))
+
+                    IconButton(
+                        onClick = {
+                            // Handle menu icon click
+                        },
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Toggle drawer",
+                            modifier = Modifier.size(80.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(10f))
+
+                    IconButton(
+                        onClick = {
+                            // Handle menu icon click
+                        },
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Toggle drawer",
+                            modifier = Modifier.size(80.dp)
+                        )
+                    }
+                }
+            }
         }
+
     ) {
         Column(modifier = Modifier.padding(it)) {
 //            val fineLocationPermissionState = rememberPermissionState(
@@ -182,61 +240,46 @@ fun MapScreen(
 //                }
 //            }
 //        }
+
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraState,
                 properties = mapProperties,
                 uiSettings = uiSettings,
-                onMapClick = {
-                    mapViewModel.addMarkerPosition(it)
 
-                    //centers map
-                    /*val cameraPosition = CameraPosition.Builder()
-                        .target(it)
-                        .build()*/
-//                val random = Random(System.currentTimeMillis())
-                    val cameraPosition = CameraPosition.Builder()
-                        .target(it)
-//                    .zoom(1f + random.nextInt(5))
-//                    .tilt(30f + random.nextInt(15))
-//                    .bearing(-45f + random.nextInt(90))
-                        .build()
-
-                    coroutineScope.launch {
-                        cameraState.animate(
-                            CameraUpdateFactory.newCameraPosition(cameraPosition),
-                            3000
-                        )
-                    }
-                }
+//                onMapClick = {
+//                    mapViewModel.addMarkerPosition(it)
+//
+//                    //centers map
+//                    /*val cameraPosition = CameraPosition.Builder()
+//                        .target(it)
+//                        .build()*/
+////                val random = Random(System.currentTimeMillis())
+//                    val cameraPosition = CameraPosition.Builder()
+//                        .target(it)
+////                    .zoom(1f + random.nextInt(5))
+////                    .tilt(30f + random.nextInt(15))
+////                    .bearing(-45f + random.nextInt(90))
+//                        .build()
+//
+//                    coroutineScope.launch {
+//                        cameraState.animate(
+//                            CameraUpdateFactory.newCameraPosition(cameraPosition),
+//                            3000
+//                        )
+//                    }
+//                }
             ) {
 
 
-//            Marker(
-//                state = MarkerState(LatLng(47.0, 19.0)),
-//                title = "Marker demo",
-//                snippet = "Hungary, population 9.7M",
-//                draggable = true
-//            )
-//
-                for (position in mapViewModel.getMarkersList()) {
-                    Marker(
-                        state = MarkerState(position = position), //should be it.latlong of the city
-                        title = "Title" //should be it.cityName
-//                    icon = bitmapDescriptor(context, R.drawable.)
-                    )
-                }
-//
-//            Polyline(
-//                points = listOf(
-//                    LatLng(47.0, 19.0),
-//                    LatLng(45.0, 18.0),
-//                    LatLng(49.0, 23.0),
-//                ),
-//                color = androidx.compose.ui.graphics.Color.Red,
-//                visible = true,
-//                width = 10f
-//            )
+//                for (position in mapViewModel.getMarkersList()) {
+//                    Marker(
+//                        state = MarkerState(position = position), //should be it.latlng of the city
+//                        title = cityName //should be it.cityName
+////                    icon = bitmapDescriptor(context, R.drawable.)
+//                    )
+//                }
+
             }
         }
     }
