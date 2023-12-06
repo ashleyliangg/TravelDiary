@@ -10,25 +10,36 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -67,7 +78,6 @@ fun AddEntryScreen(
         mutableStateOf(LocalDate.now())
     }
 
-
     val formattedStartDate by remember {
         derivedStateOf{
             DateTimeFormatter
@@ -102,214 +112,250 @@ fun AddEntryScreen(
         mutableStateOf(false)
     }
 
+    val startDateDialogState = rememberMaterialDialogState()
+    val endDateDialogState = rememberMaterialDialogState()
+
 
     val cameraPermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
     )
-
-
-    Column(
-        modifier = Modifier.padding(20.dp)
-    ) {
-
-        //display image
-        imageUri?.let {
-            val source = ImageDecoder.createSource(context.contentResolver, it)
-            bitmap.value = ImageDecoder.decodeBitmap(source)
-
-            bitmap.value?.let { btm ->
-                Image(
-                    bitmap = btm.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .padding(20.dp)
-                )
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Add an entry") },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor =
+                    MaterialTheme.colorScheme.secondaryContainer
+                ),
+                actions = {
+                    IconButton(
+                        onClick = { }
+                    ) {
+                        Icon(Icons.Filled.Info, contentDescription = "Info")
+                    }
+                }
+            )
         }
 
 
-        // permission here...
-        if (cameraPermissionState.status.isGranted) {
-            Button(onClick = {
-                photoAlbumLauncher.launch("image/*")
-            }) {
-                Text(text = "Upload a photo")
-            }
-        } else {
-            Column() {
-                val permissionText = if (cameraPermissionState.status.shouldShowRationale) {
-                    "Please reconsider giving the camera permission it is needed if you want to take photo for the message"
-                } else {
-                    "Give permission for using photos with items"
-                }
-                Text(text = permissionText)
-                Button(onClick = {
-                    cameraPermissionState.launchPermissionRequest()
-                }) {
-                    Text(text = "Request permission")
-                }
-            }
-        }
-
-        val startDateDialogState = rememberMaterialDialogState()
-        val endDateDialogState = rememberMaterialDialogState()
-
-        Row(
+    ) { it
+        Box(
             modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp)
         ) {
-            Column {
-                Button(onClick = {
-                    startDateDialogState.show()
-                }) {
-                    Text(text = "Start date")
-                }
-                Text(text = formattedStartDate)
-            }
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Column {
-                Button(onClick = {
-                    endDateDialogState.show()
-                }) {
-                    Text(text = "End date")
-                }
-                Text(text = formattedEndDate)
-            }
-        }
-
-        MaterialDialog(
-            dialogState = startDateDialogState,
-            buttons = {
-                positiveButton(text = "Ok") {
-
-                }
-                negativeButton(text = "Cancel") {
-
-                }
-            }
-        ) {
-            datepicker(
-                initialDate = LocalDate.now(),
-                title = "Pick a date",
-                //colors = DatePickerDefaults.colors(Color.Magenta),
-                allowedDateValidator = {
-                    it.dayOfMonth < LocalDate.now().dayOfMonth
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 65.dp)
             ) {
-                startDate = it
-            }
-        }
 
-        MaterialDialog(
-            dialogState = endDateDialogState,
-            buttons = {
-                positiveButton(text = "Ok") {
+                Row {
+                    //display image
+                    imageUri?.let {
+                        val source = ImageDecoder.createSource(context.contentResolver, it)
+                        bitmap.value = ImageDecoder.decodeBitmap(source)
 
+                        bitmap.value?.let { btm ->
+                            Image(
+                                bitmap = btm.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .padding(20.dp)
+                            )
+                        }
+                    }
                 }
-                negativeButton(text = "Cancel") {
+                Row {
+                    // permission here...
+                    if (cameraPermissionState.status.isGranted) {
+                        Button(onClick = {
+                            photoAlbumLauncher.launch("image/*")
 
+                        }) {
+                            if(hasImage) {
+                                Text(text = "Change photo")
+                            } else {
+                                Text(text = "Upload a photo")
+                            }
+                        }
+
+                        if(hasImage) {
+                            Button(onClick = {
+                                imageUri = null
+                            }) {
+                                Text(text = "Delete photo")
+                            }
+                        }
+                    } else {
+                        Column() {
+                            val permissionText = if (cameraPermissionState.status.shouldShowRationale) {
+                                "Please reconsider giving the camera permission it is needed if you want to take photo for the message"
+                            } else {
+                                "Give permission for using photos with items"
+                            }
+                            Text(text = permissionText)
+                            Button(onClick = {
+                                cameraPermissionState.launchPermissionRequest()
+                            }) {
+                                Text(text = "Request permission")
+                            }
+                        }
+                    }
+                }
+
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = {
+                        startDateDialogState.show()
+                    }) {
+                        Text(text = "Select start date")
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(text = formattedStartDate)
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = {
+                        endDateDialogState.show()
+                    }) {
+                        Text(text = "Select end date")
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(text = formattedEndDate)
+                }
+
+                MaterialDialog(
+                    dialogState = startDateDialogState,
+                    buttons = {
+                        positiveButton(text = "Ok") {
+
+                        }
+                        negativeButton(text = "Cancel") {
+
+                        }
+                    }
+                ) {
+                    datepicker(
+                        initialDate = LocalDate.now(),
+                        title = "Pick a date",
+                        //colors = DatePickerDefaults.colors(Color.Magenta),
+                        allowedDateValidator = {
+                            it.isBefore(LocalDate.now())
+                        }
+                    ) {
+                        startDate = it
+                    }
+                }
+
+                MaterialDialog(
+                    dialogState = endDateDialogState,
+                    buttons = {
+                        positiveButton(text = "Ok") {
+
+                        }
+                        negativeButton(text = "Cancel") {
+
+                        }
+                    }
+                ) {
+                    datepicker(
+                        initialDate = LocalDate.now(),
+                        title = "Pick a date",
+                        //colors = DatePickerDefaults.colors(Color.Magenta),
+                        allowedDateValidator = {
+                            it.isAfter(startDate) || it == startDate
+                        }
+                    ) {
+                        endDate = it
+                    }
+                }
+
+
+                OutlinedTextField(value = postTitle,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = "Post title") },
+                    onValueChange = {
+                        postTitle = it
+                    }
+                )
+                OutlinedTextField(value = postBody,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = "Post body") },
+                    onValueChange = {
+                        postBody = it
+                    }
+                )
+
+
+                if (hasImage && imageUri != null) {
+                    AsyncImage(model = imageUri,
+                        modifier = Modifier.size(200.dp, 200.dp),
+                        contentDescription = "selected image")
+                }
+
+                Button(onClick = {
+                    if (imageUri == null) {
+                        addEntryViewModel.uploadPost(
+                            postTitle,
+                            postBody,
+                            formattedStartDate,
+                            formattedEndDate)
+                    } else {
+                        addEntryViewModel
+                            .uploadPostImage(
+                                context.contentResolver,
+                                imageUri!!,
+                                postTitle,
+                                postBody,
+                                formattedStartDate,
+                                formattedEndDate
+                            )
+                    }
+                }) {
+                    Text(text = "Upload")
+                }
+
+                when (addEntryViewModel.writePostUiState) {
+                    is WritePostUiState.LoadingPostUpload -> CircularProgressIndicator()
+                    is WritePostUiState.PostUploadSuccess -> {
+                        Text(text = "Post uploaded.")
+                    }
+                    is WritePostUiState.ErrorDuringPostUpload ->
+                        Text(text =
+                        "${(addEntryViewModel.writePostUiState as WritePostUiState.ErrorDuringPostUpload).error}")
+
+                    is WritePostUiState.LoadingImageUpload -> CircularProgressIndicator()
+                    is WritePostUiState.ImageUploadSuccess -> {
+                        Text(text = "Image uploaded, starting post upload.")
+                    }
+                    is WritePostUiState.ErrorDuringImageUpload ->
+                        Text(text = "${(addEntryViewModel.writePostUiState as WritePostUiState.ErrorDuringImageUpload).error}")
+
+
+                    else -> {}
                 }
             }
-        ) {
-            datepicker(
-                initialDate = LocalDate.now(),
-                title = "Pick a date",
-                //colors = DatePickerDefaults.colors(Color.Magenta),
-                allowedDateValidator = {
-                    it.dayOfMonth - startDate.dayOfMonth >= 0 && it.dayOfMonth < LocalDate.now().dayOfMonth
-                }
-            ) {
-                endDate = it
-            }
+
         }
 
 
-
-
-        OutlinedTextField(value = postTitle,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(text = "Post title") },
-            onValueChange = {
-                postTitle = it
-            }
-        )
-        OutlinedTextField(value = postBody,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(text = "Post body") },
-            onValueChange = {
-                postBody = it
-            }
-        )
-
-//        // permission here...
-//        if (cameraPermissionState.status.isGranted) {
-//            Button(onClick = {
-//                val uri = ComposeFileProvider.getImageUri(context)
-//                imageUri = uri
-//                cameraLauncher.launch(uri) // opens the built in camera
-//            }) {
-//                Text(text = "Take photo")
-//            }
-//        } else {
-//            Column() {
-//                val permissionText = if (cameraPermissionState.status.shouldShowRationale) {
-//                    "Please reconsider giving the camera persmission it is needed if you want to take photo for the message"
-//                } else {
-//                    "Give permission for using photos with items"
-//                }
-//                Text(text = permissionText)
-//                Button(onClick = {
-//                    cameraPermissionState.launchPermissionRequest()
-//                }) {
-//                    Text(text = "Request permission")
-//                }
-//            }
-//        }
-
-        if (hasImage && imageUri != null) {
-            AsyncImage(model = imageUri,
-                modifier = Modifier.size(200.dp, 200.dp),
-                contentDescription = "selected image")
-        }
-
-        Button(onClick = {
-            if (imageUri == null) {
-                addEntryViewModel.uploadPost(postTitle, postBody)
-            } else {
-                addEntryViewModel
-                    .uploadPostImage(
-                        context.contentResolver,
-                        imageUri!!,
-                        postTitle,
-                        postBody
-                    )
-            }
-        }) {
-            Text(text = "Upload")
-        }
-
-        when (addEntryViewModel.writePostUiState) {
-            is WritePostUiState.LoadingPostUpload -> CircularProgressIndicator()
-            is WritePostUiState.PostUploadSuccess -> {
-                Text(text = "Post uploaded.")
-            }
-            is WritePostUiState.ErrorDuringPostUpload ->
-                Text(text =
-                "${(addEntryViewModel.writePostUiState as WritePostUiState.ErrorDuringPostUpload).error}")
-
-            is WritePostUiState.LoadingImageUpload -> CircularProgressIndicator()
-            is WritePostUiState.ImageUploadSuccess -> {
-                Text(text = "Image uploaded, starting post upload.")
-            }
-            is WritePostUiState.ErrorDuringImageUpload ->
-                Text(text = "${(addEntryViewModel.writePostUiState as WritePostUiState.ErrorDuringImageUpload).error}")
-
-
-            else -> {}
-        }
     }
+
+
+
+
 }
 
 class ComposeFileProvider : FileProvider(

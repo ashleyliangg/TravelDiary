@@ -4,15 +4,11 @@ import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -37,6 +33,8 @@ class AddEntryViewModel : ViewModel() {
     fun uploadPost(
         title: String,
         postBody: String,
+        startDate: String,
+        endDate: String,
         imgUrl: String = ""
     ) {
         writePostUiState = WritePostUiState.LoadingPostUpload
@@ -46,6 +44,8 @@ class AddEntryViewModel : ViewModel() {
             author = auth.currentUser!!.email!!,
             title = title,
             body = postBody,
+            startDate = startDate,
+            endDate = endDate,
             imgUrl = imgUrl
         )
 
@@ -66,7 +66,9 @@ class AddEntryViewModel : ViewModel() {
         contentResolver: ContentResolver,
         imageUri: Uri,
         title: String,
-        postBody: String
+        postBody: String,
+        startDate: String,
+        endDate: String,
     ) {
         viewModelScope.launch {
             writePostUiState = WritePostUiState.LoadingImageUpload
@@ -93,7 +95,7 @@ class AddEntryViewModel : ViewModel() {
                     writePostUiState = WritePostUiState.ImageUploadSuccess
 
                     newImagesRef.downloadUrl.addOnCompleteListener { task -> // the public URL of the image is: task.result.toString()
-                        uploadPost(title, postBody, task.result.toString())
+                        uploadPost(title, postBody, startDate, endDate, task.result.toString())
                     }
                 }
         }
