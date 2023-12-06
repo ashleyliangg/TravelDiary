@@ -58,6 +58,7 @@ fun AddEntryScreen(
         mutableStateOf(LocalDate.now())
     }
 
+
     val formattedStartDate by remember {
         derivedStateOf{
             DateTimeFormatter
