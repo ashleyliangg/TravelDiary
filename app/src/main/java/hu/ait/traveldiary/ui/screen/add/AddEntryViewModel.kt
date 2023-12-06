@@ -63,8 +63,10 @@ class AddEntryViewModel : ViewModel() {
 
 
     public fun uploadPostImage(
-        contentResolver: ContentResolver, imageUri: Uri,
-        title: String, postBody: String
+        contentResolver: ContentResolver,
+        imageUri: Uri,
+        title: String,
+        postBody: String
     ) {
         viewModelScope.launch {
             writePostUiState = WritePostUiState.LoadingImageUpload

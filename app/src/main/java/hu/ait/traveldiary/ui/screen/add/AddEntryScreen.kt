@@ -5,9 +5,9 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -43,6 +43,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun AddEntryScreen(
@@ -73,37 +74,39 @@ fun AddEntryScreen(
         }
     }
 
-    var imageUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
     val context = LocalContext.current
 
     val bitmap = remember {mutableStateOf<Bitmap?>(null)}
 
-    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-        imageUri = uri
-    }
+    var imageUri by remember {mutableStateOf<Uri?>(null)}
+
+    val photoAlbumLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            imageUri = uri
+        }
+    )
 
 
     var hasImage by remember {
         mutableStateOf(false)
     }
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
-            hasImage = success
-        }
-    )
+
     val cameraPermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
     )
 
+    val photosPermissionState = rememberPermissionState(
+        android.Manifest.permission.READ_MEDIA_IMAGES
+    )
 
 
     Column(
         modifier = Modifier.padding(20.dp)
     ) {
+
+        //display image
         imageUri?.let {
             val source = ImageDecoder.createSource(context.contentResolver, it)
             bitmap.value = ImageDecoder.decodeBitmap(source)
@@ -113,16 +116,34 @@ fun AddEntryScreen(
                     bitmap = btm.asImageBitmap(),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(400.dp)
+                        .size(200.dp)
                         .padding(20.dp)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
 
-        Button(onClick = { launcher.launch("image/*")}) {
-            Text(text = "upload an image")
+        // permission here...
+        if (cameraPermissionState.status.isGranted) {
+            Button(onClick = {
+                photoAlbumLauncher.launch("image/*")
+            }) {
+                Text(text = "Upload a photo")
+            }
+        } else {
+            Column() {
+                val permissionText = if (cameraPermissionState.status.shouldShowRationale) {
+                    "Please reconsider giving the camera permission it is needed if you want to take photo for the message"
+                } else {
+                    "Give permission for using photos with items"
+                }
+                Text(text = permissionText)
+                Button(onClick = {
+                    cameraPermissionState.launchPermissionRequest()
+                }) {
+                    Text(text = "Request permission")
+                }
+            }
         }
 
 
@@ -141,30 +162,30 @@ fun AddEntryScreen(
             }
         )
 
-        // permission here...
-        if (cameraPermissionState.status.isGranted) {
-            Button(onClick = {
-                val uri = ComposeFileProvider.getImageUri(context)
-                imageUri = uri
-                cameraLauncher.launch(uri) // opens the built in camera
-            }) {
-                Text(text = "Take photo")
-            }
-        } else {
-            Column() {
-                val permissionText = if (cameraPermissionState.status.shouldShowRationale) {
-                    "Please reconsider giving the camera persmission it is needed if you want to take photo for the message"
-                } else {
-                    "Give permission for using photos with items"
-                }
-                Text(text = permissionText)
-                Button(onClick = {
-                    cameraPermissionState.launchPermissionRequest()
-                }) {
-                    Text(text = "Request permission")
-                }
-            }
-        }
+//        // permission here...
+//        if (cameraPermissionState.status.isGranted) {
+//            Button(onClick = {
+//                val uri = ComposeFileProvider.getImageUri(context)
+//                imageUri = uri
+//                cameraLauncher.launch(uri) // opens the built in camera
+//            }) {
+//                Text(text = "Take photo")
+//            }
+//        } else {
+//            Column() {
+//                val permissionText = if (cameraPermissionState.status.shouldShowRationale) {
+//                    "Please reconsider giving the camera persmission it is needed if you want to take photo for the message"
+//                } else {
+//                    "Give permission for using photos with items"
+//                }
+//                Text(text = permissionText)
+//                Button(onClick = {
+//                    cameraPermissionState.launchPermissionRequest()
+//                }) {
+//                    Text(text = "Request permission")
+//                }
+//            }
+//        }
 
         if (hasImage && imageUri != null) {
             AsyncImage(model = imageUri,
