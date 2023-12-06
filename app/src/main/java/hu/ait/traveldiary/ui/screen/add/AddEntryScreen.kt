@@ -4,8 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -73,17 +71,15 @@ fun AddEntryScreen(
         }
     }
 
-    var imageUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
     val context = LocalContext.current
 
     val bitmap = remember {mutableStateOf<Bitmap?>(null)}
 
+    var imageUri by remember {mutableStateOf<Uri?>(null)}
+
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
         imageUri = uri
     }
-
 
     var hasImage by remember {
         mutableStateOf(false)
@@ -100,10 +96,10 @@ fun AddEntryScreen(
     )
 
 
-
     Column(
         modifier = Modifier.padding(20.dp)
     ) {
+
         imageUri?.let {
             val source = ImageDecoder.createSource(context.contentResolver, it)
             bitmap.value = ImageDecoder.decodeBitmap(source)
@@ -121,9 +117,11 @@ fun AddEntryScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
+
         Button(onClick = { launcher.launch("image/*")}) {
             Text(text = "upload an image")
         }
+
 
 
         OutlinedTextField(value = postTitle,
