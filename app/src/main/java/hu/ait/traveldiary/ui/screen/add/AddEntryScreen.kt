@@ -5,16 +5,19 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -37,6 +41,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import hu.ait.traveldiary.R
 import java.io.File
 import java.time.LocalDate
@@ -51,6 +59,7 @@ fun AddEntryScreen(
 ) {
     var postTitle by remember { mutableStateOf("") }
     var postBody by remember { mutableStateOf("") }
+
     var startDate by remember {
         mutableStateOf(LocalDate.now())
     }
@@ -62,7 +71,7 @@ fun AddEntryScreen(
     val formattedStartDate by remember {
         derivedStateOf{
             DateTimeFormatter
-                .ofPattern("MM dd yyyy")
+                .ofPattern("MM/dd/yyyy")
                 .format(startDate)
         }
     }
@@ -70,7 +79,7 @@ fun AddEntryScreen(
     val formattedEndDate by remember {
         derivedStateOf{
             DateTimeFormatter
-                .ofPattern("MM dd yyyy")
+                .ofPattern("MM/dd/yyyy")
                 .format(endDate)
         }
     }
@@ -96,10 +105,6 @@ fun AddEntryScreen(
 
     val cameraPermissionState = rememberPermissionState(
         android.Manifest.permission.CAMERA
-    )
-
-    val photosPermissionState = rememberPermissionState(
-        android.Manifest.permission.READ_MEDIA_IMAGES
     )
 
 
@@ -146,6 +151,81 @@ fun AddEntryScreen(
                 }
             }
         }
+
+        val startDateDialogState = rememberMaterialDialogState()
+        val endDateDialogState = rememberMaterialDialogState()
+
+        Row(
+            modifier = Modifier
+        ) {
+            Column {
+                Button(onClick = {
+                    startDateDialogState.show()
+                }) {
+                    Text(text = "Start date")
+                }
+                Text(text = formattedStartDate)
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column {
+                Button(onClick = {
+                    endDateDialogState.show()
+                }) {
+                    Text(text = "End date")
+                }
+                Text(text = formattedEndDate)
+            }
+        }
+
+        MaterialDialog(
+            dialogState = startDateDialogState,
+            buttons = {
+                positiveButton(text = "Ok") {
+
+                }
+                negativeButton(text = "Cancel") {
+
+                }
+            }
+        ) {
+            datepicker(
+                initialDate = LocalDate.now(),
+                title = "Pick a date",
+                //colors = DatePickerDefaults.colors(Color.Magenta),
+                allowedDateValidator = {
+                    it.dayOfMonth < LocalDate.now().dayOfMonth
+                }
+            ) {
+                startDate = it
+            }
+        }
+
+        MaterialDialog(
+            dialogState = endDateDialogState,
+            buttons = {
+                positiveButton(text = "Ok") {
+
+                }
+                negativeButton(text = "Cancel") {
+
+                }
+            }
+        ) {
+            datepicker(
+                initialDate = LocalDate.now(),
+                title = "Pick a date",
+                //colors = DatePickerDefaults.colors(Color.Magenta),
+                allowedDateValidator = {
+                    it.dayOfMonth - startDate.dayOfMonth >= 0 && it.dayOfMonth < LocalDate.now().dayOfMonth
+                }
+            ) {
+                endDate = it
+            }
+        }
+
+
 
 
         OutlinedTextField(value = postTitle,
