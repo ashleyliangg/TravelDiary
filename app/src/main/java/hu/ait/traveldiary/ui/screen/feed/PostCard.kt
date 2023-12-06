@@ -27,7 +27,7 @@ import hu.ait.traveldiary.data.Post
 fun PostCard(
     post: Post,
     onRemoveItem: () -> Unit = {},
-    currentUserId: String = ""
+    currentUserId: String = "",
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -37,7 +37,7 @@ fun PostCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 10.dp
         ),
-        modifier = Modifier.padding(5.dp).fillMaxSize()
+        modifier = Modifier.padding(5.dp).fillMaxSize(),
     ) {
         Column(
             modifier = Modifier
@@ -66,6 +66,9 @@ fun PostCard(
                     Text(
                         text = post.body,
                     )
+                    Text(
+                        text = post.startDate
+                    )
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -86,3 +89,4 @@ fun PostCard(
         }
     }
 }
+

@@ -72,7 +72,7 @@ fun FeedScreen(
                 Text(text = "Init...")
             } else if (postListState.value is FeedScreenUIState.Success) {
                 LazyColumn {
-                    items((postListState.value as FeedScreenUIState.Success).postList){
+                    items((postListState.value as FeedScreenUIState.Success).postList) {
                         PostCard(post = it.post,
                             onRemoveItem = {
                                 feedViewModel.deletePost(it.postId)

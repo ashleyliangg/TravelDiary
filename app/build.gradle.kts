@@ -98,6 +98,9 @@ dependencies {
 
     // Extended icons
     //implementation ("androidx.compose.material:material-icons-extended:$compose_version")
+
+    //Date picker
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
 }
 
 // Allow references to generated code
