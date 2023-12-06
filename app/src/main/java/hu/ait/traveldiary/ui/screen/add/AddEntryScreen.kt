@@ -70,6 +70,7 @@ fun AddEntryScreen(
 ) {
     var postTitle by remember { mutableStateOf("") }
     var postBody by remember { mutableStateOf("") }
+    var postLocation by remember { mutableStateOf("") }
 
     var startDate by remember {
         mutableStateOf(LocalDate.now())
@@ -282,17 +283,24 @@ fun AddEntryScreen(
                     }
                 }
 
+                OutlinedTextField(value = postLocation,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = "Trip Location: Enter an address, city, or country") },
+                    onValueChange = {
+                        postLocation = it
+                    }
+                )
 
                 OutlinedTextField(value = postTitle,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(text = "Post title") },
+                    label = { Text(text = "Trip name") },
                     onValueChange = {
                         postTitle = it
                     }
                 )
                 OutlinedTextField(value = postBody,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(text = "Post body") },
+                    label = { Text(text = "Trip details: share what you did!") },
                     onValueChange = {
                         postBody = it
                     }
