@@ -67,7 +67,6 @@ fun FeedScreen(
         }
     ) { it ->
         Column(modifier = Modifier.padding(it)) {
-
             if (postListState.value == FeedScreenUIState.Init) {
                 Text(text = "Init...")
             } else if (postListState.value is FeedScreenUIState.Success) {

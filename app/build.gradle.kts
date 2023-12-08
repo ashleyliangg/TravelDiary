@@ -81,26 +81,26 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 
     // Navigation
-    val nav_version = "2.5.3"
+    val nav_version = "2.7.5"
     implementation("androidx.navigation:navigation-runtime-ktx:$nav_version")
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
 
     // Hilt - DI
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-compiler:2.44")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.45")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // AsyncImage
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
-    implementation("io.coil-kt:coil-compose:2.1.0")
-
-    // Extended icons
-    //implementation ("androidx.compose.material:material-icons-extended:$compose_version")
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     //Date picker
     implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
+
+    // Bottom Sheet
+    implementation ("androidx.compose.material3:material3:1.2.0-alpha12")
 }
 
 // Allow references to generated code

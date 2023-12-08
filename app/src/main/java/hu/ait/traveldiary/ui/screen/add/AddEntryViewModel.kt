@@ -31,18 +31,20 @@ class AddEntryViewModel : ViewModel() {
     private var auth: FirebaseAuth = Firebase.auth
 
     fun uploadPost(
-        title: String,
+        cityName: String,
+        postTitle: String,
         postBody: String,
         startDate: String,
         endDate: String,
-        imgUrl: String = ""
+        imgUrl: String = "",
+        toString: String = ""
     ) {
         writePostUiState = WritePostUiState.LoadingPostUpload
 
         val myPost = Post(
             uid = auth.currentUser!!.uid,
-            author = auth.currentUser!!.email!!,
-            title = title,
+            cityName = cityName,
+            title = postTitle,
             body = postBody,
             startDate = startDate,
             endDate = endDate,
@@ -62,9 +64,10 @@ class AddEntryViewModel : ViewModel() {
     }
 
 
-    public fun uploadPostImage(
+    fun uploadPostImage(
         contentResolver: ContentResolver,
         imageUri: Uri,
+        cityName: String,
         title: String,
         postBody: String,
         startDate: String,
@@ -91,11 +94,12 @@ class AddEntryViewModel : ViewModel() {
                 .addOnFailureListener { e ->
                     writePostUiState =
                         WritePostUiState.ErrorDuringImageUpload(e.message)
-                }.addOnSuccessListener { taskSnapshot ->
+                }.addOnSuccessListener { _ ->
                     writePostUiState = WritePostUiState.ImageUploadSuccess
 
                     newImagesRef.downloadUrl.addOnCompleteListener { task -> // the public URL of the image is: task.result.toString()
-                        uploadPost(title, postBody, startDate, endDate, task.result.toString())
+                        uploadPost(cityName, title, postBody, startDate, endDate,
+                            imageUri.toString(), task.result.toString())
                     }
                 }
         }
