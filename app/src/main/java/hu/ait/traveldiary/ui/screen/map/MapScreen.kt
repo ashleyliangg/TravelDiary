@@ -1,7 +1,14 @@
 package hu.ait.traveldiary.ui.screen.map
 
 import android.Manifest
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
+import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -27,21 +35,27 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -51,14 +65,20 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import hu.ait.traveldiary.R
+import hu.ait.traveldiary.data.Post
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.util.Locale
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     mapViewModel: MyMapViewModel = hiltViewModel(),
-    cityName: String
 ) {
     val coroutineScope = rememberCoroutineScope()
+
+    var context = LocalContext.current
 
     var cameraState = rememberCameraPositionState {
         CameraPosition.fromLatLngZoom(
@@ -74,6 +94,7 @@ fun MapScreen(
             )
         )
     }
+
     var mapProperties by remember {
         mutableStateOf(
             MapProperties(
@@ -134,6 +155,7 @@ fun MapScreen(
                 )
             )
         },
+
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -189,54 +211,26 @@ fun MapScreen(
         }
 
     ) {
-
-
         Column(modifier = Modifier.padding(it)) {
             val fineLocationPermissionState = rememberPermissionState(
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
-            if (fineLocationPermissionState.status.isGranted) {
-                Column {
-                    Button(onClick = {
-                        mapViewModel.startLocationMonitoring()
-                    }) {
-                        Text(text = "Start location monitoring")
-                    }
-                    Text(
-                        text = "Location: ${getLocationText(mapViewModel.locationState.value)}"
-                    )
 
-                //This part. I also made two functions at the bottom (line 267-273) and tried
-                //LatLng(getLat(mapViewModel.locationState.value), getLng(mapViewModel.locationState.value)
-                //instead of mapViewModel.locationState.value!!.latitude and mapViewModel.locationState.value!!.longitude, but
-                //it still doesn't work. 
-//                    Marker(
-//                        state = MarkerState(
-//                            position = LatLng(
-//                                mapViewModel.locationState.value!!.latitude,
-//                                mapViewModel.locationState.value!!.longitude
-//                            )
-//                        ),
-//                        title = "Your Location"
-//                    )
-                }
-            } else {
-                Column() {
-                    val permissionText =
-                        if (fineLocationPermissionState.status.shouldShowRationale) {
-                            "Please consider giving permission"
-                        } else {
-                            "Give permission for location"
-                        }
-                    Text(text = permissionText)
-                    Button(onClick = {
-                        fineLocationPermissionState.launchPermissionRequest()
-                    }) {
-                        Text(text = "Request permission")
-                    }
-                }
+            val geocoder = Geocoder(context, Locale.ENGLISH)
+            val city = "Budapest"
+            val locations: List<Address>? = null
+            geocoder.getFromLocationName(city, 3)
+
+            LaunchedEffect(key1 = Unit) {
+                fineLocationPermissionState.launchPermissionRequest()
             }
 
+            if (fineLocationPermissionState.status.isGranted) {
+                mapViewModel.startLocationMonitoring()
+                Text(
+                    text = "Location: ${getLocationText(mapViewModel.locationState.value)} "
+                )
+            }
 
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
@@ -244,14 +238,19 @@ fun MapScreen(
                 properties = mapProperties,
                 uiSettings = uiSettings
             ) {
+                MapMarker(
+                    position = LatLng(47.0, 19.0),
+                    title = city,
+                    context = LocalContext.current,
+                    iconResourceId = R.drawable.ic_launcher_foreground
+                )
 
-                for (position in mapViewModel.getMarkersList()) {
-                    Marker(
-                        state = MarkerState(position = position), //should be it.latlng of the city
-                        title = cityName, //should be it.cityName
-                    )
-                }
-
+//                Marker(
+//                    state = MarkerState(
+//                        position = LatLng(locations!!.get(0).latitude, locations!!.get(0).longitude)
+//                    ),
+//                    title = city
+//                )
             }
         }
     }
@@ -264,11 +263,38 @@ fun getLocationText(location: Location?): String {
     """.trimIndent()
 }
 
-//fun getLat(location: Location): Double {
-//    return location.latitude
-//}
-//
-//fun getLng(location: Location): Double {
-//    return location.longitude
-//}
+@Composable
+fun MapMarker(
+    context: Context,
+    position: LatLng,
+    title: String,
+    @DrawableRes iconResourceId: Int
+) {
+    val icon = bitmapDescriptor(
+        context, iconResourceId
+    )
 
+    Marker(
+        state = MarkerState(position = position),
+        title = title,
+        icon = icon,
+    )
+}
+
+fun bitmapDescriptor(
+    context: Context,
+    vectorResId: Int
+): BitmapDescriptor? {
+    // retrieve the actual drawable
+    val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
+    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+    val bm = Bitmap.createBitmap(
+        drawable.intrinsicWidth,
+        drawable.intrinsicHeight,
+        Bitmap.Config.ARGB_8888
+    )
+    // draw it onto the bitmap
+    val canvas = android.graphics.Canvas(bm)
+    drawable.draw(canvas)
+    return BitmapDescriptorFactory.fromBitmap(bm)
+}
