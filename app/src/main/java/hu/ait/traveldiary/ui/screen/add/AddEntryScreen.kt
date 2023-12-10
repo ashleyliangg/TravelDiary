@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -62,6 +59,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import hu.ait.traveldiary.R
+import hu.ait.traveldiary.utils.bounceClick
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -143,13 +141,16 @@ fun AddEntryScreen(
                     .fillMaxSize()
                     .padding(top = 65.dp)
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()) {
-                    if(!hasImage) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (!hasImage) {
                         val imageUploadComposition by rememberLottieComposition(
                             LottieCompositionSpec.RawRes(
                                 R.raw.image_upload
-                            ))
+                            )
+                        )
                         val imageUploadProgress by animateLottieCompositionAsState(
                             imageUploadComposition,
                             iterations = LottieConstants.IterateForever,
@@ -183,10 +184,10 @@ fun AddEntryScreen(
                     Row {
                         // permission here...
                         if (cameraPermissionState.status.isGranted) {
-                            Button(
+                            Button(modifier = Modifier.bounceClick(),
                                 onClick = {
-                                photoAlbumLauncher.launch("image/*")
-                            }) {
+                                    photoAlbumLauncher.launch("image/*")
+                                }) {
                                 if (hasImage) {
                                     Text(text = "Change photo")
                                 } else {
@@ -196,10 +197,11 @@ fun AddEntryScreen(
 
                             if (hasImage) {
                                 Spacer(modifier = Modifier.padding(10.dp))
-                                Button(onClick = {
-                                    imageUri = null
-                                    hasImage = false
-                                }) {
+                                Button(modifier = Modifier.bounceClick(),
+                                    onClick = {
+                                        imageUri = null
+                                        hasImage = false
+                                    }) {
                                     Text(text = "Delete photo")
                                 }
                             }
@@ -212,9 +214,10 @@ fun AddEntryScreen(
                                         "Give permission for using photos with items"
                                     }
                                 Text(text = permissionText)
-                                Button(onClick = {
-                                    cameraPermissionState.launchPermissionRequest()
-                                }) {
+                                Button(modifier = Modifier.bounceClick(),
+                                    onClick = {
+                                        cameraPermissionState.launchPermissionRequest()
+                                    }) {
                                     Text(text = "Request permission")
                                 }
                             }
@@ -226,9 +229,10 @@ fun AddEntryScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(onClick = {
-                        startDateDialogState.show()
-                    }) {
+                    Button(modifier = Modifier.bounceClick(),
+                        onClick = {
+                            startDateDialogState.show()
+                        }) {
                         Text(text = "Select date")
                     }
 
@@ -333,28 +337,29 @@ fun AddEntryScreen(
 //                    )
 //                }
 
-                Button(onClick = {
-                    if (imageUri == null) {
-                        addEntryViewModel.uploadPost(
-                            postLocation,
-                            postTitle,
-                            postBody,
-                            formattedStartDate,
+                Button(modifier = Modifier.bounceClick(),
+                    onClick = {
+                        if (imageUri == null) {
+                            addEntryViewModel.uploadPost(
+                                postLocation,
+                                postTitle,
+                                postBody,
+                                formattedStartDate,
 //                            formattedEndDate,
-                            //toString = task.result.toString()
-                        )
-                    } else {
-                        addEntryViewModel.uploadPostImage(
-                            context.contentResolver,
-                            imageUri!!,
-                            postLocation,
-                            postTitle,
-                            postBody,
-                            formattedStartDate,
+                                //toString = task.result.toString()
+                            )
+                        } else {
+                            addEntryViewModel.uploadPostImage(
+                                context.contentResolver,
+                                imageUri!!,
+                                postLocation,
+                                postTitle,
+                                postBody,
+                                formattedStartDate,
 //                                formattedEndDate
-                        )
-                    }
-                }) {
+                            )
+                        }
+                    }) {
                     Text(text = "Upload")
                 }
 
@@ -409,3 +414,4 @@ class ComposeFileProvider : FileProvider(
         }
     }
 }
+
