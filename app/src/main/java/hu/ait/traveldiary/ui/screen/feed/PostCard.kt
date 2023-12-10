@@ -32,6 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import hu.ait.traveldiary.R
 import hu.ait.traveldiary.data.Post
 
 @Composable
@@ -106,8 +112,25 @@ fun BottomSheet(postBody: String, postStartDate: String, onDismiss: () -> Unit, 
         sheetState = modalBottomSheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
     ) {
+        val clauseComposition by rememberLottieComposition(
+            LottieCompositionSpec.RawRes(
+                R.raw.clause
+            )
+        )
+        val clauseProgress by animateLottieCompositionAsState(
+            clauseComposition,
+            iterations = LottieConstants.IterateForever,
+            isPlaying = true
+        )
+        LottieAnimation(
+            composition = clauseComposition,
+            progress = clauseProgress,
+            modifier = Modifier
+                .size(200.dp)
+                .align(Alignment.CenterHorizontally)
+        )
         Row(
-            modifier = Modifier.padding(5.dp),
+            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
@@ -116,9 +139,11 @@ fun BottomSheet(postBody: String, postStartDate: String, onDismiss: () -> Unit, 
             ) {
                 Text(
                     text = postBody,
+                    fontSize = 17.sp
                 )
                 Text(
-                    text = postStartDate
+                    text = postStartDate,
+                    fontWeight = FontWeight.Light
                 )
             }
             Icon(
