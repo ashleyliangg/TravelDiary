@@ -7,9 +7,10 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Geocoder.GeocodeListener
 import android.location.Location
+import android.os.Build
 import android.util.Log
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.clickable
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,7 +47,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -80,6 +80,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
@@ -120,10 +121,6 @@ fun MapScreen(
 
     val cityLatLng = mutableMapOf<String, LatLng>()
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
     val cityToPhoto =
         mutableMapOf<String, String>()
 
@@ -135,6 +132,18 @@ fun MapScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
+                        Switch(
+                            checked = isSatellite,
+                            onCheckedChange = {
+                                isSatellite = it
+                                mapProperties = mapProperties.copy(
+                                    mapType = if (isSatellite) MapType.SATELLITE else MapType.NORMAL
+                                )
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
                         Text(
                             text = "Where I've gone",
                             style = MaterialTheme.typography.headlineLarge,
@@ -142,6 +151,20 @@ fun MapScreen(
                             textAlign = TextAlign.Center,
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        IconButton(
+                            onClick = {
+                                // Handle menu icon click
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Toggle drawer",
+                                modifier = Modifier.size(35.dp)
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -209,11 +232,8 @@ fun MapScreen(
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
 
-<<<<<<< Updated upstream
 
 
-=======
->>>>>>> Stashed changes
             LaunchedEffect(key1 = Unit) {
                 fineLocationPermissionState.launchPermissionRequest()
             }
@@ -232,7 +252,6 @@ fun MapScreen(
                 properties = mapProperties,
                 uiSettings = uiSettings
             ) {
-<<<<<<< Updated upstream
 
 //                LaunchedEffect(key1 = cityPhoto) {
                 val geocoder = Geocoder(context, Locale.ENGLISH)
@@ -269,35 +288,6 @@ fun MapScreen(
 //                                ),
 //                                title = entry.key,
 //                            )
-=======
-                 val geocoder = Geocoder(context, Locale.ENGLISH)
-
-                    val maxResult = 1
-
-                    Log.d("HELP", "before succes")
-
-                    if (cityPhoto.value is MapScreenUIState.Success) {
-                        Log.d("HELP", "passed succes")
-                        (cityPhoto.value as MapScreenUIState.Success).citiesAndPhoto.forEach {
-                            var locationState by remember {
-                                mutableStateOf(LatLng(0.0, 0.0))
-                            }
-                            geocoder.getFromLocationName(it.cityName,maxResult,object: GeocodeListener {
-                                override fun onGeocode(addresses: MutableList<Address>) {
-                                    locationState = LatLng(addresses.get(0).latitude, addresses.get(0).longitude)
-                                    Log.d("HELP", locationState.toString())
-                                }
-                            })
-                            cityLatLng[it.cityName] = locationState
-                            cityToPhoto[it.cityName] = it.imgUrl
-                        }
-                    }
-                cityLatLng.forEach { entry ->
-                    Log.d("HELP", entry.key)
-                    if (entry.value != LatLng(0.0, 0.0)) {
-
-                        Log.d("HELP", entry.value.toString())
->>>>>>> Stashed changes
 
                         MapMarker(
                             position = entry.value,
@@ -305,7 +295,6 @@ fun MapScreen(
                             context = LocalContext.current,
                             iconResourceId = R.drawable.mapicon
                         )
-<<<<<<< Updated upstream
 
 
                     }
@@ -313,10 +302,6 @@ fun MapScreen(
 
 
 
-=======
-                    }
-                }
->>>>>>> Stashed changes
             }
         }
     }

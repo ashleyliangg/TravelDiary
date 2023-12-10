@@ -1,5 +1,6 @@
 package hu.ait.traveldiary
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -17,12 +18,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
-    ) {
+    ) {it ->
         BottomNavGraph(navController = navController)
     }
 }
