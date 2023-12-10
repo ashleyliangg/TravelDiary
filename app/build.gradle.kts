@@ -96,11 +96,15 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
     implementation("io.coil-kt:coil-compose:2.4.0")
 
-    //Date picker
+    // Date picker
     implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
 
     // Bottom Sheet
-    implementation ("androidx.compose.material3:material3:1.2.0-alpha12")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha12")
+
+    // Lottie Animations
+    val lottieVersion = "6.2.0"
+    implementation("com.airbnb.android:lottie:$lottieVersion")
 }
 
 // Allow references to generated code

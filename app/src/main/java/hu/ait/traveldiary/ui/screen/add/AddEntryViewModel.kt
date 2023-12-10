@@ -36,8 +36,7 @@ class AddEntryViewModel : ViewModel() {
         postBody: String,
         startDate: String,
         endDate: String,
-        imgUrl: String = "",
-        toString: String = ""
+        imgUrl: String = ""
     ) {
         writePostUiState = WritePostUiState.LoadingPostUpload
 
@@ -98,8 +97,7 @@ class AddEntryViewModel : ViewModel() {
                     writePostUiState = WritePostUiState.ImageUploadSuccess
 
                     newImagesRef.downloadUrl.addOnCompleteListener { task -> // the public URL of the image is: task.result.toString()
-                        uploadPost(cityName, title, postBody, startDate, endDate,
-                            imageUri.toString(), task.result.toString())
+                        uploadPost(cityName, title, postBody, startDate, endDate, task.result.toString())
                     }
                 }
         }
