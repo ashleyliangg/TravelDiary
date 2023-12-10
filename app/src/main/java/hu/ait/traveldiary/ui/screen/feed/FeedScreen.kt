@@ -41,13 +41,6 @@ fun FeedScreen(
                     containerColor =
                     MaterialTheme.colorScheme.secondaryContainer
                 ),
-                actions = {
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(Icons.Filled.Info, contentDescription = "Info")
-                    }
-                }
             )
         },
         floatingActionButton = {

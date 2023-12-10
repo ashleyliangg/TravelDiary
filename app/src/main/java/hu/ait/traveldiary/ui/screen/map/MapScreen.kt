@@ -86,8 +86,6 @@ import java.util.Locale
 fun MapScreen(
     mapViewModel: MyMapViewModel = hiltViewModel(),
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     var context = LocalContext.current
 
     var cameraState = rememberCameraPositionState {
@@ -112,12 +110,10 @@ fun MapScreen(
             )
         )
     }
-    var isSatellite by remember {
-        mutableStateOf(false)
-    }
 
     val cityPhoto = mapViewModel.getCityPics().collectAsState(
-        initial = MapScreenUIState.Init)
+        initial = MapScreenUIState.Init
+    )
 
     val cityLatLng = mutableMapOf<String, LatLng>()
 
@@ -132,98 +128,18 @@ fun MapScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Switch(
-                            checked = isSatellite,
-                            onCheckedChange = {
-                                isSatellite = it
-                                mapProperties = mapProperties.copy(
-                                    mapType = if (isSatellite) MapType.SATELLITE else MapType.NORMAL
-                                )
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
                         Text(
                             text = "Where I've gone",
                             style = MaterialTheme.typography.headlineLarge,
                             fontStyle = FontStyle.Normal,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.align(Alignment.CenterVertically)
+                            textAlign = TextAlign.Center
                         )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        IconButton(
-                            onClick = {
-                                // Handle menu icon click
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Toggle drawer",
-                                modifier = Modifier.size(35.dp)
-                            )
-                        }
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             )
-        },
-        bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            ) {
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically),
-                ) {
-                    IconButton(
-                        onClick = {
-                            // Handle menu icon click
-                        },
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Toggle drawer",
-                            modifier = Modifier.size(80.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.weight(10f))
-
-                    IconButton(
-                        onClick = {
-                            // Handle menu icon click
-                        },
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Toggle drawer",
-                            modifier = Modifier.size(80.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.weight(10f))
-
-                    IconButton(
-                        onClick = {
-                            // Handle menu icon click
-                        },
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Toggle drawer",
-                            modifier = Modifier.size(80.dp)
-                        )
-                    }
-                }
-            }
         }
 
     ) {
@@ -232,18 +148,8 @@ fun MapScreen(
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
 
-
-
             LaunchedEffect(key1 = Unit) {
                 fineLocationPermissionState.launchPermissionRequest()
-            }
-
-
-            if (fineLocationPermissionState.status.isGranted) {
-                mapViewModel.startLocationMonitoring()
-                Text(
-                    text = "Location: ${getLocationText(mapViewModel.locationState.value)} "
-                )
             }
 
             GoogleMap(
@@ -252,66 +158,48 @@ fun MapScreen(
                 properties = mapProperties,
                 uiSettings = uiSettings
             ) {
-
-//                LaunchedEffect(key1 = cityPhoto) {
                 val geocoder = Geocoder(context, Locale.ENGLISH)
 
                 val maxResult = 1
 
-                Log.d("HELP", "before succes")
-
                 if (cityPhoto.value is MapScreenUIState.Success) {
-                    Log.d("HELP", "passed succes")
                     (cityPhoto.value as MapScreenUIState.Success).citiesAndPhoto.forEach {
-                        var locationState by remember {
-                            mutableStateOf(LatLng(0.0, 0.0))
-                        }
-                        geocoder.getFromLocationName(it.cityName,maxResult,object: GeocodeListener {
-                            override fun onGeocode(addresses: MutableList<Address>) {
-                                locationState = LatLng(addresses.get(0).latitude, addresses.get(0).longitude)
-                                Log.d("HELP", locationState.toString())
+                        if (!it.imgUrl.isEmpty()) {
+                            var locationState by remember {
+                                mutableStateOf(LatLng(0.0, 0.0))
                             }
-                        })
-                        cityLatLng[it.cityName] = locationState
-                        cityToPhoto[it.cityName] = it.imgUrl
-                    }
+                            geocoder.getFromLocationName(
+                                it.cityName,
+                                maxResult,
+                                object : GeocodeListener {
+                                    override fun onGeocode(addresses: MutableList<Address>) {
+                                        locationState = LatLng(
+                                            addresses.get(0).latitude,
+                                            addresses.get(0).longitude
+                                        )
+                                    }
+                                }
+                            )
+                            cityLatLng[it.cityName] = locationState
+                            cityToPhoto[it.cityName] = it.imgUrl
+                        }
 
+                    }
                 }
 
-//                }
                 cityLatLng.forEach { entry ->
-                    Log.d("HELP", entry.key)
                     if (entry.value != LatLng(0.0, 0.0)) {
-//                            Marker(
-//                                state = MarkerState(
-//                                    position = entry.value
-//                                ),
-//                                title = entry.key,
-//                            )
-
                         MapMarker(
                             position = entry.value,
                             title = entry.key,
                             context = LocalContext.current,
                             iconResourceId = R.drawable.mapicon
                         )
-
-
                     }
                 }
-
-
-
             }
         }
     }
-}
-
-fun getLocationText(location: Location?): String {
-    return """
-       Lat: ${location?.latitude} 
-       Lng: ${location?.longitude}
-    """.trimIndent()
 }
 
 @Composable
