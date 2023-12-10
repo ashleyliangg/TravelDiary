@@ -22,10 +22,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -34,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -61,14 +60,19 @@ fun LoginScreen(
             contentScale = ContentScale.Crop,
             modifier = Modifier.matchParentSize()
         )
-        Text(
-            text = "Wander Snap",
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 50.dp),
-            fontSize = 50.sp,
-            color = Color.Black
-        )
+        Row(Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Start){
+            Text(
+                text = "Wander Snap",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 45.dp, top = 200.dp, end = 180.dp),
+                lineHeight = 40.sp,
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                )
+        }
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
