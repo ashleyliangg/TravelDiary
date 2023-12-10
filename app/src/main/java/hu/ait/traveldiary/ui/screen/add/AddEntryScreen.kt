@@ -362,8 +362,12 @@ fun AddEntryScreen(
 //                                formattedEndDate
                         )
                     }
+                    postTitle = ""
+                    postBody = ""
+                    postLocation = ""
+                    startDate = LocalDate.now()
                 }) {
-                    Text(text = "Upload")
+                    Text(text = "Create Post")
                 }
 
 
@@ -398,7 +402,6 @@ fun AddEntryScreen(
                     }
 
                     is WritePostUiState.ErrorDuringImageUpload -> Text(text = "${(addEntryViewModel.writePostUiState as WritePostUiState.ErrorDuringImageUpload).error}")
-
 
                     else -> {}
                 }

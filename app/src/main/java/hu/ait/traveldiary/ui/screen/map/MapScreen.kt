@@ -143,7 +143,10 @@ fun MapScreen(
         }
 
     ) {
-        Column(modifier = Modifier.padding(it)) {
+        Column(modifier = Modifier
+            .padding(it)
+            .padding(bottom = 50.dp)
+        ) {
             val fineLocationPermissionState = rememberPermissionState(
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
