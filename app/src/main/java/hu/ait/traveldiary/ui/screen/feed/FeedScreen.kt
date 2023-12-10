@@ -1,6 +1,7 @@
 package hu.ait.traveldiary.ui.screen.feed
 
 import androidx.compose.foundation.layout.Column
+//import androidx.compose.foundation.layout.ColumnScopeInstance.weight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -43,23 +44,25 @@ fun FeedScreen(
                 ),
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    onNavigateToAddPost()
-                },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = "Add",
-                    tint = Color.White,
-                )
-            }
-        }
+//        floatingActionButton = {
+//            FloatingActionButton(
+//                onClick = {
+//                    onNavigateToAddPost()
+//                },
+//                containerColor = MaterialTheme.colorScheme.secondary,
+//                shape = RoundedCornerShape(16.dp),
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Rounded.Add,
+//                    contentDescription = "Add",
+//                    tint = Color.White,
+//                )
+//            }
+//        }
     ) { it ->
-        Column(modifier = Modifier.padding(it)) {
+        Column(modifier = Modifier
+            .padding(it)
+        ) {
             if (postListState.value == FeedScreenUIState.Init) {
                 Text(text = "Init...")
             } else if (postListState.value is FeedScreenUIState.Success) {
