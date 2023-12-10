@@ -14,3 +14,8 @@ data class PostWithId(
     val postId: String,
     val post: Post
 )
+
+data class CityWithPhoto(
+    val cityName: String,
+    val imgUrl: String
+)

@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "hu.ait.traveldiary"
-        minSdk = 28
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

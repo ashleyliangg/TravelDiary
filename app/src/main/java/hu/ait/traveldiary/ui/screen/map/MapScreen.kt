@@ -3,9 +3,9 @@ package hu.ait.traveldiary.ui.screen.map
 import android.Manifest
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.location.Address
 import android.location.Geocoder
+import android.location.Geocoder.GeocodeListener
 import android.location.Location
 import android.util.Log
 import androidx.annotation.DrawableRes
@@ -17,10 +17,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -36,6 +36,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +50,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -66,7 +70,10 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import hu.ait.traveldiary.R
+import hu.ait.traveldiary.data.CityWithPhoto
 import hu.ait.traveldiary.data.Post
+import hu.ait.traveldiary.ui.screen.feed.FeedScreenUIState
+import hu.ait.traveldiary.ui.screen.feed.PostCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -94,7 +101,6 @@ fun MapScreen(
             )
         )
     }
-
     var mapProperties by remember {
         mutableStateOf(
             MapProperties(
@@ -106,6 +112,14 @@ fun MapScreen(
     var isSatellite by remember {
         mutableStateOf(false)
     }
+
+    val cityPhoto = mapViewModel.getCityPics().collectAsState(
+        initial = MapScreenUIState.Init)
+
+    val cityLatLng = mutableMapOf<String, LatLng>()
+
+    val cityToPhoto =
+        mutableMapOf<String, String>()
 
     Scaffold(
         topBar = {
@@ -128,7 +142,7 @@ fun MapScreen(
                         Spacer(modifier = Modifier.weight(1f))
 
                         Text(
-                            text = "TITLE",
+                            text = "Where I've gone",
                             style = MaterialTheme.typography.headlineLarge,
                             fontStyle = FontStyle.Normal,
                             textAlign = TextAlign.Center,
@@ -155,7 +169,6 @@ fun MapScreen(
                 )
             )
         },
-
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -216,14 +229,12 @@ fun MapScreen(
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
 
-            val geocoder = Geocoder(context, Locale.ENGLISH)
-            val city = "Budapest"
-            val locations: List<Address>? = null
-            geocoder.getFromLocationName(city, 3)
+
 
             LaunchedEffect(key1 = Unit) {
                 fineLocationPermissionState.launchPermissionRequest()
             }
+
 
             if (fineLocationPermissionState.status.isGranted) {
                 mapViewModel.startLocationMonitoring()
@@ -238,19 +249,56 @@ fun MapScreen(
                 properties = mapProperties,
                 uiSettings = uiSettings
             ) {
-                MapMarker(
-                    position = LatLng(47.0, 19.0),
-                    title = city,
-                    context = LocalContext.current,
-                    iconResourceId = R.drawable.ic_launcher_foreground
-                )
 
-//                Marker(
-//                    state = MarkerState(
-//                        position = LatLng(locations!!.get(0).latitude, locations!!.get(0).longitude)
-//                    ),
-//                    title = city
-//                )
+//                LaunchedEffect(key1 = cityPhoto) {
+                val geocoder = Geocoder(context, Locale.ENGLISH)
+
+                val maxResult = 1
+
+                Log.d("HELP", "before succes")
+
+                if (cityPhoto.value is MapScreenUIState.Success) {
+                    Log.d("HELP", "passed succes")
+                    (cityPhoto.value as MapScreenUIState.Success).citiesAndPhoto.forEach {
+                        var locationState by remember {
+                            mutableStateOf(LatLng(0.0, 0.0))
+                        }
+                        geocoder.getFromLocationName(it.cityName,maxResult,object: GeocodeListener {
+                            override fun onGeocode(addresses: MutableList<Address>) {
+                                locationState = LatLng(addresses.get(0).latitude, addresses.get(0).longitude)
+                                Log.d("HELP", locationState.toString())
+                            }
+                        })
+                        cityLatLng[it.cityName] = locationState
+                        cityToPhoto[it.cityName] = it.imgUrl
+                    }
+
+                }
+
+//                }
+                cityLatLng.forEach { entry ->
+                    Log.d("HELP", entry.key)
+                    if (entry.value != LatLng(0.0, 0.0)) {
+//                            Marker(
+//                                state = MarkerState(
+//                                    position = entry.value
+//                                ),
+//                                title = entry.key,
+//                            )
+
+                        MapMarker(
+                            position = entry.value,
+                            title = entry.key,
+                            context = LocalContext.current,
+                            iconResourceId = R.drawable.mapicon
+                        )
+
+
+                    }
+                }
+
+
+
             }
         }
     }
@@ -285,14 +333,16 @@ fun bitmapDescriptor(
     context: Context,
     vectorResId: Int
 ): BitmapDescriptor? {
+
     // retrieve the actual drawable
     val drawable = ContextCompat.getDrawable(context, vectorResId) ?: return null
-    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+    drawable.setBounds(0, 0, 150, 150)
     val bm = Bitmap.createBitmap(
-        drawable.intrinsicWidth,
-        drawable.intrinsicHeight,
+        150,
+        150,
         Bitmap.Config.ARGB_8888
     )
+
     // draw it onto the bitmap
     val canvas = android.graphics.Canvas(bm)
     drawable.draw(canvas)
