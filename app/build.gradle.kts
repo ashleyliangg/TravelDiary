@@ -104,7 +104,7 @@ dependencies {
 
     // Lottie Animations
     val lottieVersion = "6.2.0"
-    implementation("com.airbnb.android:lottie:$lottieVersion")
+    implementation("com.airbnb.android:lottie-compose:$lottieVersion")
 }
 
 // Allow references to generated code
