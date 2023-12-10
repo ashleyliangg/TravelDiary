@@ -122,9 +122,9 @@ fun AddEntryScreen(
         TopAppBar(title = { Text("Add an entry") }, colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ), actions = {
-            IconButton(onClick = { }) {
-                Icon(Icons.Filled.Info, contentDescription = "Info")
-            }
+//            IconButton(onClick = { }) {
+//                Icon(Icons.Filled.Info, contentDescription = "Info")
+//            }
         })
     }
 
@@ -139,7 +139,8 @@ fun AddEntryScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 65.dp)
+                    .padding(top = 65.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -184,7 +185,7 @@ fun AddEntryScreen(
                     Row {
                         // permission here...
                         if (cameraPermissionState.status.isGranted) {
-                            Button(modifier = Modifier.bounceClick(),
+                            Button(
                                 onClick = {
                                     photoAlbumLauncher.launch("image/*")
                                 }) {
@@ -197,7 +198,7 @@ fun AddEntryScreen(
 
                             if (hasImage) {
                                 Spacer(modifier = Modifier.padding(10.dp))
-                                Button(modifier = Modifier.bounceClick(),
+                                Button(
                                     onClick = {
                                         imageUri = null
                                         hasImage = false
@@ -225,11 +226,12 @@ fun AddEntryScreen(
                     }
                 }
 
+                Spacer(Modifier.padding(10.dp))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(modifier = Modifier.bounceClick(),
+                    Button(
                         onClick = {
                             startDateDialogState.show()
                         }) {
@@ -296,6 +298,7 @@ fun AddEntryScreen(
 //                        endDate = it
 //                    }
 //                }
+                Spacer(Modifier.padding(5.dp))
 
                 OutlinedTextField(value = postLocation,
                     modifier = Modifier.fillMaxWidth(),
@@ -336,37 +339,53 @@ fun AddEntryScreen(
 //                        contentDescription = "selected image"
 //                    )
 //                }
+                Spacer(Modifier.padding(15.dp))
 
-                Button(modifier = Modifier.bounceClick(),
-                    onClick = {
-                        if (imageUri == null) {
-                            addEntryViewModel.uploadPost(
-                                postLocation,
-                                postTitle,
-                                postBody,
-                                formattedStartDate,
+                Button(onClick = {
+                    if (imageUri == null) {
+                        addEntryViewModel.uploadPost(
+                            postLocation,
+                            postTitle,
+                            postBody,
+                            formattedStartDate,
 //                            formattedEndDate,
-                                //toString = task.result.toString()
-                            )
-                        } else {
-                            addEntryViewModel.uploadPostImage(
-                                context.contentResolver,
-                                imageUri!!,
-                                postLocation,
-                                postTitle,
-                                postBody,
-                                formattedStartDate,
+                            //toString = task.result.toString()
+                        )
+                    } else {
+                        addEntryViewModel.uploadPostImage(
+                            context.contentResolver,
+                            imageUri!!,
+                            postLocation,
+                            postTitle,
+                            postBody,
+                            formattedStartDate,
 //                                formattedEndDate
-                            )
-                        }
-                    }) {
+                        )
+                    }
+                }) {
                     Text(text = "Upload")
                 }
+
 
                 when (addEntryViewModel.writePostUiState) {
                     is WritePostUiState.LoadingPostUpload -> CircularProgressIndicator()
                     is WritePostUiState.PostUploadSuccess -> {
-                        Text(text = "Post uploaded.")
+                        val uploadedComposition by rememberLottieComposition(
+                            LottieCompositionSpec.RawRes(
+                                R.raw.uploaded
+                            )
+                        )
+                        val uploadedProgress by animateLottieCompositionAsState(
+                            uploadedComposition,
+                            iterations = LottieConstants.IterateForever,
+                            isPlaying = true
+                        )
+                        LottieAnimation(
+                            composition = uploadedComposition,
+                            progress = uploadedProgress,
+                            modifier = Modifier
+                                .size(100.dp)
+                        )
                     }
 
                     is WritePostUiState.ErrorDuringPostUpload -> Text(
@@ -386,11 +405,7 @@ fun AddEntryScreen(
             }
 
         }
-
-
     }
-
-
 }
 
 class ComposeFileProvider : FileProvider(
