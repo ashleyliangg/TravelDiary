@@ -48,7 +48,7 @@ fun LoginScreen(
 
     Box() {
         Text(
-            text = "Wander Snap",
+            text = "AIT Forum",
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 50.dp),
