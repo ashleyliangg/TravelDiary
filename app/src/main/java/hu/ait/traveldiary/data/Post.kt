@@ -7,7 +7,6 @@ data class Post(
     var body: String = "",
     var imgUrl: String = "",
     val startDate: String = "",
-    val endDate: String = ""
 )
 
 data class PostWithId(
