@@ -124,17 +124,10 @@ fun MapScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Where I've gone",
-                            style = MaterialTheme.typography.headlineLarge,
-                            fontStyle = FontStyle.Normal,
-                            textAlign = TextAlign.Center
+                    Text(
+                            text = "Where I've gone"
                         )
-                    }
+
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
