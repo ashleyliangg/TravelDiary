@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -56,14 +57,14 @@ fun LoginScreen(
     Box() {
         Image(
             painter = painterResource(id = R.drawable.tickets),
-            contentDescription = "Login background",
+            contentDescription = stringResource(R.string.login_background),
             contentScale = ContentScale.Crop,
             modifier = Modifier.matchParentSize()
         )
         Row(Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.Start){
             Text(
-                text = "Wander Snap",
+                text = stringResource(R.string.wander_snap),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 45.dp, top = 200.dp, end = 180.dp),
@@ -83,7 +84,7 @@ fun LoginScreen(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(0.8f),
                 label = {
-                    Text(text = "E-mail")
+                    Text(text = stringResource(R.string.e_mail))
                 },
                 value = email,
                 onValueChange = {
@@ -97,7 +98,7 @@ fun LoginScreen(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(0.8f),
                 label = {
-                    Text(text = "Password")
+                    Text(text = stringResource(R.string.password))
                 },
                 value = password,
                 onValueChange = { password = it },
@@ -132,12 +133,12 @@ fun LoginScreen(
                         }
                     }
                 }) {
-                    Text(text = "Login")
+                    Text(text = stringResource(R.string.login))
                 }
                 OutlinedButton(onClick = {
                     loginViewModel.registerUser(email,password)
                 }) {
-                    Text(text = "Register")
+                    Text(text = stringResource(R.string.register))
                 }
             }
         }
@@ -150,11 +151,11 @@ fun LoginScreen(
         ) {
             when (loginViewModel.loginUiState) {
                 is LoginUiState.Loading -> CircularProgressIndicator()
-                is LoginUiState.RegisterSuccess -> Text(text = "Registration OK")
-                is LoginUiState.Error -> Text(text = "Error: ${
+                is LoginUiState.RegisterSuccess -> Text(text = stringResource(R.string.registration_ok))
+                is LoginUiState.Error -> Text(text = stringResource(R.string.error) + "${
                     (loginViewModel.loginUiState as LoginUiState.Error).error
                 }")
-                is LoginUiState.LoginSuccess -> Text(text = "Login OK")
+                is LoginUiState.LoginSuccess -> Text(text = stringResource(R.string.login_ok))
                 LoginUiState.Init -> {}
             }
 

@@ -35,7 +35,6 @@ class AddEntryViewModel : ViewModel() {
         postTitle: String,
         postBody: String,
         startDate: String,
-        //endDate: String,
         imgUrl: String = ""
     ) {
         writePostUiState = WritePostUiState.LoadingPostUpload
@@ -46,7 +45,6 @@ class AddEntryViewModel : ViewModel() {
             title = postTitle,
             body = postBody,
             startDate = startDate,
-           // endDate = endDate,
             imgUrl = imgUrl
         )
 
@@ -62,7 +60,6 @@ class AddEntryViewModel : ViewModel() {
         }
     }
 
-
     fun uploadPostImage(
         contentResolver: ContentResolver,
         imageUri: Uri,
@@ -70,7 +67,6 @@ class AddEntryViewModel : ViewModel() {
         title: String,
         postBody: String,
         startDate: String,
-        //endDate: String,
     ) {
         viewModelScope.launch {
             writePostUiState = WritePostUiState.LoadingImageUpload
@@ -105,7 +101,6 @@ class AddEntryViewModel : ViewModel() {
     }
 
 }
-
 
 sealed interface WritePostUiState {
     object Init : WritePostUiState

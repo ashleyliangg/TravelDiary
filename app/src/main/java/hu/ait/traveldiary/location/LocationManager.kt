@@ -26,7 +26,6 @@ class LocationManager @Inject constructor(
             Priority.PRIORITY_HIGH_ACCURACY, 1000).apply {
             setMinUpdateDistanceMeters(5f)
             setGranularity(Granularity.GRANULARITY_FINE)
-            //setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
             setWaitForAccurateLocation(true)
         }.build()
 
