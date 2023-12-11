@@ -11,6 +11,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,21 +22,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,15 +53,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -74,6 +89,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import hu.ait.traveldiary.R
 import hu.ait.traveldiary.data.CityWithPhoto
 import hu.ait.traveldiary.data.Post
+import hu.ait.traveldiary.ui.screen.feed.BottomSheet
 import hu.ait.traveldiary.ui.screen.feed.FeedScreenUIState
 import hu.ait.traveldiary.ui.screen.feed.PostCard
 import kotlinx.coroutines.Dispatchers
@@ -144,6 +160,8 @@ fun MapScreen(
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
 
+            var showSheet by remember { mutableStateOf(false) }
+
             LaunchedEffect(key1 = Unit) {
                 fineLocationPermissionState.launchPermissionRequest()
             }
@@ -189,8 +207,22 @@ fun MapScreen(
                             position = entry.value,
                             title = entry.key,
                             context = LocalContext.current,
-                            iconResourceId = R.drawable.mapicon
+                            iconResourceId = R.drawable.mapicon,
+                            onClick = {
+                                // Handle marker click here, e.g., show a dialog
+                                showSheet = true
+                            }
                         )
+
+                        if (showSheet) {
+                            BottomSheet (
+                                imgUrl = cityToPhoto[entry.key]!!,
+                                onDismiss = {
+                                    showSheet = false
+                                },
+                            )
+
+                        }
                     }
                 }
             }
@@ -203,7 +235,8 @@ fun MapMarker(
     context: Context,
     position: LatLng,
     title: String,
-    @DrawableRes iconResourceId: Int
+    @DrawableRes iconResourceId: Int,
+    onClick: () -> Unit
 ) {
     val icon = bitmapDescriptor(
         context, iconResourceId
@@ -213,7 +246,13 @@ fun MapMarker(
         state = MarkerState(position = position),
         title = title,
         icon = icon,
+        onClick = {
+            onClick()
+            true
+        }
     )
+
+
 }
 
 fun bitmapDescriptor(
@@ -234,4 +273,45 @@ fun bitmapDescriptor(
     val canvas = android.graphics.Canvas(bm)
     drawable.draw(canvas)
     return BitmapDescriptorFactory.fromBitmap(bm)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BottomSheet(
+    imgUrl: String,
+    onDismiss: () -> Unit,
+) {
+    val modalBottomSheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = { onDismiss() },
+        sheetState = modalBottomSheetState,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+    ) {
+
+        Row(
+//            modifier = Modifier.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = imgUrl,
+                modifier = Modifier
+                    .fillMaxSize(),
+//                        .clickable {
+//                            showSheet = true
+//                        },
+                contentDescription = "Pin Image"
+            )
+
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Delete",
+                modifier = Modifier.clickable {
+                    onDismiss()
+                },
+                tint = Color.Red
+            )
+        }
+        Spacer(modifier = Modifier.padding(30.dp))
+    }
 }

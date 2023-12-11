@@ -68,6 +68,7 @@ fun PostCard(
                 onRemove = {onRemoveItem()})
         }
 
+
         Column(
             modifier = Modifier
                 .padding(10.dp)
